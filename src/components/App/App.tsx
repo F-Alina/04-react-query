@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchBar from "../SearchBar/SearchBar";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
@@ -17,7 +17,7 @@ export default function App() {
 
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, isError, isFetched } = useQuery({
+  const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: query !== "",
@@ -41,9 +41,11 @@ export default function App() {
     setSelectedMovie(null);
   };
 
-  if (isFetched && movies.length === 0 && query !== "") {
-    toast.error("No movies found for your request.");
-  }
+  useEffect(() => {
+    if (isSuccess && movies.length === 0 && query !== "") {
+      toast.error("No movies found for your request.");
+    }
+  }, [isSuccess, movies.length, query]);
 
   return (
     <div className={css.app}>
